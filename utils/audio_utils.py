@@ -7,14 +7,15 @@ import numpy as np
 import webrtcvad
 
 
-def apply_bandpass_filter(in_path, out_path):
+
+def apply_bandpass_filter(in_path, out_path, low=3000, high=200):
     # ffmpeg -i input.wav -acodec pcm_s16le -ac 1 -ar 16000 -af lowpass=3000,highpass=200 output.wav
     p = subprocess.Popen(["ffmpeg", "-y",
-        "-acodec", "pcm_s16le",
+        #"-acodec", "pcm_s16le",
          "-i", in_path,    
          "-acodec", "pcm_s16le",
          "-ac", "1",
-         "-af", "lowpass=3000,highpass=200",
+         "-af", "lowpass=%i,highpass=%i" % (low, high),
          "-ar", "16000",         
          out_path
          ], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
@@ -37,6 +38,7 @@ def correct_volume(in_path, out_path, db=-10):
 
     if p.returncode != 0:
         raise Exception("Failed to correct volume: %s" % str(err))
+
 
 def cut_wave(wave_obj, outfilename, start_ms, end_ms):
     width = wave_obj.getsampwidth()
