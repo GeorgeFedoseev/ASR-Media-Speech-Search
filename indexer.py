@@ -55,23 +55,30 @@ def process_video(yt_video_id):
     pieces, avg_len_sec = slice_audio_by_silence(wave_o)
     print("total pieces: %i, avg_len_sec: %f" % (len(pieces), avg_len_sec))
 
-    # first remove prev pieces
-    pieces_folder_path = os.path.join(curr_dir_path, "data/pieces")
+    
+    pieces_folder_path = os.path.join(video_data_path, "pieces/")
+    if not os.path.exists(pieces_folder_path):
+        os.makedirs(pieces_folder_path)
 
-    if os.path.exists(pieces_folder_path):
-        shutil.rmtree(pieces_folder_path)
-
-    os.makedirs(pieces_folder_path)
+    
 
 
     print("start transcribing...")
     for i, piece in enumerate(pieces):
-        piece_path = os.path.join(pieces_folder_path, "piece_%i.wav" % i)
-        audio_utils.save_wave_samples_to_file(piece["samples"], n_channels=1, byte_width=2, sample_rate=16000, file_path=piece_path)
 
-        # run inference
-        text = run_deepspeech_for_wav(piece_path, use_lm=False)
-        print(text)        
+        piece_procesing_path = os.path.join(pieces_folder_path, "piece_%i_%.2f_processing.wav" % (i, piece["start"]))
+        piece_done_path = os.path.join(pieces_folder_path, "piece_%i_%.2f_done.wav" % (i, piece["start"]))
+
+        if not (os.path.exists(piece_procesing_path) or os.path.exists(piece_done_path)):
+            audio_utils.save_wave_samples_to_file(piece["samples"], n_channels=1, byte_width=2, sample_rate=16000, file_path=piece_procesing_path)        
+
+        if not os.path.exists(piece_done_path):
+            # run inference
+            print("Transcribing piece %s" % piece_procesing_path)
+            text = run_deepspeech_for_wav(piece_procesing_path, use_lm=True)
+            print(text)            
+            os.rename(piece_procesing_path, piece_done_path)
+        
 
 if __name__ == "__main__":
     if check_dependencies():

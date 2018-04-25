@@ -8,12 +8,12 @@ import audio_utils
 
 import const
 
-curr_dir_path = const.curr_dir_path
-GRAPH_PATH = os.path.join(curr_dir_path, "deepspeech_model/output_graph.pb")
-ALPHABET_PATH = os.path.join(curr_dir_path, "deepspeech_model/alphabet.txt")
 
-LM_PATH = os.path.join(curr_dir_path, "deepspeech_model/lm.binary")
-TRIE_PATH = os.path.join(curr_dir_path, "deepspeech_model/trie")
+GRAPH_PATH = os.path.join(const.DEEP_SPEECH_MODEL_PATH, "output_graph.pb")
+ALPHABET_PATH = os.path.join(const.DEEP_SPEECH_MODEL_PATH, "alphabet.txt")
+
+LM_PATH = os.path.join(const.DEEP_SPEECH_MODEL_PATH, "lm.binary")
+TRIE_PATH = os.path.join(const.DEEP_SPEECH_MODEL_PATH, "trie")
 
 def run_deepspeech_for_wav(wav_file_path, use_lm = True):    
 

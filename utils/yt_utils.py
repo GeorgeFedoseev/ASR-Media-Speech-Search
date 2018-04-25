@@ -9,7 +9,7 @@ import pafy
 def download_yt_audio(yt_video_id):
 
     curr_dir_path = const.curr_dir_path
-    video_data_path = os.path.join(curr_dir_path, "data/" + yt_video_id + "/")
+    video_data_path = os.path.join(curr_dir_path, const.VIDEO_DATA_DIR + yt_video_id + "/")
 
     if not os.path.exists(video_data_path):
         os.makedirs(video_data_path)
