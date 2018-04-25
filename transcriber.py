@@ -10,9 +10,8 @@ from utils.slicing_utils import slice_audio_by_silence
 from utils import audio_utils
 from utils.deepspeech_utils import run_deepspeech_for_wav
 
-from sqlalchemy import create_engine
-from sqlalchemy.orm import sessionmaker
-from models import Base, Transcription
+from models import Transcription
+from utils import db_util
 
 from timeit import default_timer as timer
 
@@ -27,7 +26,6 @@ YT_VIDEOS_TO_INDEX = [
     "SAQFzYnRTts"
 ]
 
-transcript_db = None
 
 
 def check_dependencies():
@@ -41,19 +39,7 @@ def check_dependencies():
 
     return True
 
-def init_db():
-    global transcript_db
 
-    if not os.path.exists(const.TRANSCRIBED_DATA_PATH):
-        os.makedirs(const.TRANSCRIBED_DATA_PATH)
-    engine = create_engine('sqlite:///%s' % (const.TRANSCRIBED_SPEECH_SQLITE_DB_PATH))         
-    Base.metadata.create_all(bind=engine)
-    DBSession = sessionmaker(bind=engine)
-    session = DBSession()
-    transcript_db = session
-    # t = Transcription(media_type="test", media_id="4gdfgdf2", time_start=0, time_end=1.51, transcription="test")
-    # session.add(t)
-    # session.commit()
 
 def process_video(yt_video_id):
     curr_dir_path = os.getcwd()
@@ -111,8 +97,7 @@ def process_video(yt_video_id):
             print(transcript)            
 
             t = Transcription(media_type="youtube", media_id=yt_video_id, time_start=piece["start"], time_end=piece["end"], transcription=transcript)
-            transcript_db.add(t)
-            transcript_db.commit()
+            db_util.add_item(t)
 
             os.rename(piece_procesing_path, piece_done_path)
         
