@@ -52,18 +52,26 @@ def index_all():
     writer.commit()
 
 
-def search(q):
+def full_text_search(q):
     ix = open_dir(const.TRANSCRIBED_WHOOSH_INDEX_DIR_PATH)
 
     parser = QueryParser("transcript", ix.schema)
     q = q.decode('utf-8')
     query = parser.parse(q)
+
+    results = []
     
     with ix.searcher() as searcher:
-        results = searcher.search(query)
+        res = searcher.search(query)
 
-        for r in results:
-            print(r.highlights("transcript"))
+        for r in res:
+            results.append((
+                r.fields()["transcription_id"],
+                r.highlights("transcript")
+                ))
+
+    return results
+            
 
 #ix = open_dir(const.TRANSCRIBED_WHOOSH_INDEX_DIR_PATH)
 
@@ -72,9 +80,9 @@ def search(q):
 if __name__ == "__main__":
     #index_all()
 
-    q = "производная"    
+    q = "линекс"    
     print ("searching for %s" % (q))
-    search(q)
+    full_text_search(q)
 
 
 
